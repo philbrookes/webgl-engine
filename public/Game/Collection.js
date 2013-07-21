@@ -31,7 +31,7 @@ Collection.prototype.loadObjFile = function(objDataSrc){
 
     $.ajax(
         {
-            url: "../Blends/" + objDataSrc
+            url: "/objects/" + objDataSrc
         }
     ).done(function(data){
         me.raw = data;

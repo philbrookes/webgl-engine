@@ -16,6 +16,26 @@ Renderable.prototype.addVertice = function(vertice){
     this.colorNum++;
 }
 
+Renderable.prototype.handleLoadedTexture = function(texture){
+    var gl = this.renderer.engine.gl;
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+}
+
+Renderable.prototype.loadTexture = function(Texture){
+    this.texture = this.renderer.engine.gl.createTexture();
+    this.texture.image = new Image();
+    var me = this;
+    this.texture.image.onload = function(){
+        me.handleLoadedTexture(me.texture);
+    }
+    this.texture.image.src = Texture;
+}
+
 Renderable.prototype.prepareMatrix = function(renderer){
     mat4.translate(renderer.mvMatrix, [this.x, this.y, this.z]);
     if(this.pitch % 360){
@@ -35,14 +55,21 @@ Renderable.prototype.draw = function(renderer) {
     renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     renderer.engine.gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, renderer.engine.gl.FLOAT, false, 0, 0);
 
-    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.vertexColorBuffer);
-    renderer.engine.gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexColorAttribute, this.vertexColorBuffer.itemSize, renderer.engine.gl.FLOAT, false, 0, 0);
+
+    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.cubeVertexTextureCoordBuffer);
+    renderer.engine.gl.vertexAttribPointer(renderer.engine.shaderProgram.textureCoordAttribute, this.cubeVertexTextureCoordBuffer.itemSize, renderer.engine.gl.FLOAT, false, 0, 0);
+
+    renderer.engine.gl.activeTexture(renderer.engine.gl.TEXTURE0);
+    renderer.engine.gl.bindTexture(renderer.engine.gl.TEXTURE_2D, this.texture);
+    renderer.engine.gl.uniform1i(renderer.engine.shaderProgram.samplerUniform, 0);
 
     renderer.setMatrixUniforms();
     renderer.engine.gl.drawArrays(this.listType, 0, this.vertexPositionBuffer.numItems);
 }
 
 Renderable.prototype.initBuffer = function(renderer) {
+    this.loadTexture("/objects/Collector/crate.jpg");
+    this.setupTextureArray();
     this.vertexPositionBuffer = renderer.engine.gl.createBuffer();
     renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     renderer.engine.gl.bufferData(renderer.engine.gl.ARRAY_BUFFER, new Float32Array(this.vertices), renderer.engine.gl.STATIC_DRAW);
@@ -56,6 +83,28 @@ Renderable.prototype.initBuffer = function(renderer) {
     this.vertexColorBuffer.numItems = this.colorNum;
 }
 
+Renderable.prototype.setupTextureArray = function(){
+    var textureCoords = [
+        0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
+        1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+        1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
+        0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
+        0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
+        0.0, 1.0, 0.0, 0.0, 1.0, 1.0
+    ];
+    this.cubeVertexTextureCoordBuffer = this.renderer.engine.gl.createBuffer();
+    this.renderer.engine.gl.bindBuffer(this.renderer.engine.gl.ARRAY_BUFFER, this.cubeVertexTextureCoordBuffer);
+
+    this.renderer.engine.gl.bufferData(this.renderer.engine.gl.ARRAY_BUFFER, new Float32Array(textureCoords), this.renderer.engine.gl.STATIC_DRAW);
+    this.cubeVertexTextureCoordBuffer.itemSize = 2;
+    this.cubeVertexTextureCoordBuffer.numItems = 36;
+}
 
 Renderable.prototype.setColor = function(color){
     this.color = color;
