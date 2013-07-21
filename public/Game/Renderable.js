@@ -13,7 +13,15 @@ Renderable.prototype.addVertice = function(vertice){
     }
     this.vertices.push(vertice);
     this.itemNum = Math.floor(this.vertices.length / this.itemSize);
-    this.colorNum++;
+}
+
+Renderable.prototype.addTextureVertice = function(vertice){
+    if(typeof this.textureVertices !== "object")
+    {
+        this.textureVertices = [];
+    }
+    this.textureVertices.push(vertice);
+    this.textureNum = Math.floor(this.textureVertices.length / this.textureSize);
 }
 
 Renderable.prototype.handleLoadedTexture = function(texture){
@@ -68,8 +76,7 @@ Renderable.prototype.draw = function(renderer) {
 }
 
 Renderable.prototype.initBuffer = function(renderer) {
-    this.loadTexture("/objects/Collector/crate.jpg");
-    this.setupTextureArray();
+    this.setupTextureArray(renderer);
     this.vertexPositionBuffer = renderer.engine.gl.createBuffer();
     renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     renderer.engine.gl.bufferData(renderer.engine.gl.ARRAY_BUFFER, new Float32Array(this.vertices), renderer.engine.gl.STATIC_DRAW);
@@ -83,27 +90,14 @@ Renderable.prototype.initBuffer = function(renderer) {
     this.vertexColorBuffer.numItems = this.colorNum;
 }
 
-Renderable.prototype.setupTextureArray = function(){
-    var textureCoords = [
-        0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
-        0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
-        0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
-        0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
-        1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-        1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-        0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
-        0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
-        0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
-        0.0, 1.0, 0.0, 0.0, 1.0, 1.0
-    ];
-    this.cubeVertexTextureCoordBuffer = this.renderer.engine.gl.createBuffer();
-    this.renderer.engine.gl.bindBuffer(this.renderer.engine.gl.ARRAY_BUFFER, this.cubeVertexTextureCoordBuffer);
+Renderable.prototype.setupTextureArray = function(renderer){
+    var textureCoords = this.textureVertices;
+    this.cubeVertexTextureCoordBuffer = renderer.engine.gl.createBuffer();
+    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.cubeVertexTextureCoordBuffer);
 
-    this.renderer.engine.gl.bufferData(this.renderer.engine.gl.ARRAY_BUFFER, new Float32Array(textureCoords), this.renderer.engine.gl.STATIC_DRAW);
-    this.cubeVertexTextureCoordBuffer.itemSize = 2;
-    this.cubeVertexTextureCoordBuffer.numItems = 36;
+    renderer.engine.gl.bufferData(renderer.engine.gl.ARRAY_BUFFER, new Float32Array(textureCoords), this.renderer.engine.gl.STATIC_DRAW);
+    this.cubeVertexTextureCoordBuffer.itemSize = this.textureSize;
+    this.cubeVertexTextureCoordBuffer.numItems = this.textureNum;
 }
 
 Renderable.prototype.setColor = function(color){
