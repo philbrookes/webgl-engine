@@ -6,7 +6,7 @@ Collection.prototype = new Renderable();
 
 var loadedCollections = [];
 
-Collection.prototype.init = function(renderer, objDataSrc){
+Collection.prototype.init = function(renderer, objDataDir, objDataFile){
     this.renderer = renderer;
 
     this.setColor([1, 1, 1, 1.0]);
@@ -21,18 +21,20 @@ Collection.prototype.init = function(renderer, objDataSrc){
     this.pitch = 0;
     this.roll = 0;
 
+    this.dataDir = objDataDir;
+
     this.objects = [];
     this.materials = [];
-    this.loadObjFile(objDataSrc);
+    this.loadObjFile(objDataDir, objDataFile);
     this.loadedMtlLibs = [];
 }
 
-Collection.prototype.loadObjFile = function(objDataSrc){
+Collection.prototype.loadObjFile = function(objDataDir, objDataFile){
     var me = this;
 
     $.ajax(
         {
-            url: "../public/objects/" + objDataSrc
+            url: objDataDir + objDataFile
             , async: false
         }
     ).done(function(data){
@@ -102,7 +104,7 @@ Collection.prototype.load = function(){
                 var me = this;
                 $.ajax(
                 {
-                    url: "../public/objects/Collector/" + mtllib
+                    url: this.dataDir + mtllib
                     , async: false
                 }
                 ).done(function(data){
@@ -198,7 +200,7 @@ Collection.prototype.load = function(){
             var matname = line.split(" ")[1];
             for(i in this.materials){
                 if(this.materials[i].name == matname){
-                    currentObject.loadTexture("../public/objects/Collector/" + this.materials[i].path);
+                    currentObject.loadTexture(this.dataDir + this.materials[i].path);
                 }
             }
         }
