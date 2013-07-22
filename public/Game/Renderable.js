@@ -62,19 +62,19 @@ Renderable.prototype.prepareMatrix = function(renderer){
 }
 
 Renderable.prototype.draw = function(renderer) {
-    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-    renderer.engine.gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, renderer.engine.gl.FLOAT, false, 0, 0);
+    var gl = renderer.engine.gl;
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+    gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
+    gl.vertexAttribPointer(renderer.engine.shaderProgram.textureCoordAttribute, this.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.cubeVertexTextureCoordBuffer);
-    renderer.engine.gl.vertexAttribPointer(renderer.engine.shaderProgram.textureCoordAttribute, this.cubeVertexTextureCoordBuffer.itemSize, renderer.engine.gl.FLOAT, false, 0, 0);
-
-    renderer.engine.gl.activeTexture(renderer.engine.gl.TEXTURE0);
-    renderer.engine.gl.bindTexture(renderer.engine.gl.TEXTURE_2D, this.texture);
-    renderer.engine.gl.uniform1i(renderer.engine.shaderProgram.samplerUniform, 0);
+//    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+//    gl.uniform1i(renderer.engine.shaderProgram.samplerUniform, 0);
 
     renderer.setMatrixUniforms();
-    renderer.engine.gl.drawArrays(this.listType, 0, this.vertexPositionBuffer.numItems);
+    gl.drawArrays(this.listType, 0, this.vertexTextureCoordBuffer.numItems);
 }
 
 Renderable.prototype.initBuffer = function(renderer) {
@@ -89,12 +89,12 @@ Renderable.prototype.initBuffer = function(renderer) {
 Renderable.prototype.setupTextureArray = function(renderer){
 
     var textureCoords = this.textureVertices;
-    this.cubeVertexTextureCoordBuffer = renderer.engine.gl.createBuffer();
-    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.cubeVertexTextureCoordBuffer);
+    this.vertexTextureCoordBuffer = renderer.engine.gl.createBuffer();
+    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
 
     renderer.engine.gl.bufferData(renderer.engine.gl.ARRAY_BUFFER, new Float32Array(textureCoords), this.renderer.engine.gl.STATIC_DRAW);
-    this.cubeVertexTextureCoordBuffer.itemSize = this.textureSize;
-    this.cubeVertexTextureCoordBuffer.numItems = this.textureNum;
+    this.vertexTextureCoordBuffer.itemSize = this.textureSize;
+    this.vertexTextureCoordBuffer.numItems = this.textureNum;
 }
 
 Renderable.prototype.setColor = function(color){
