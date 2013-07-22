@@ -6,7 +6,7 @@ Collection.prototype = new Renderable();
 
 var loadedCollections = [];
 
-Collection.prototype.init = function(renderer, objDataSrc){
+Collection.prototype.init = function(renderer, objDataDir, objDataFile){
     this.renderer = renderer;
 
     this.setColor([1, 1, 1, 1.0]);
@@ -21,17 +21,21 @@ Collection.prototype.init = function(renderer, objDataSrc){
     this.pitch = 0;
     this.roll = 0;
 
-    this.objects = [];
+    this.dataDir = objDataDir;
 
-    this.loadObjFile(objDataSrc);
+    this.objects = [];
+    this.materials = [];
+    this.loadObjFile(objDataDir, objDataFile);
+    this.loadedMtlLibs = [];
 }
 
-Collection.prototype.loadObjFile = function(objDataSrc){
+Collection.prototype.loadObjFile = function(objDataDir, objDataFile){
     var me = this;
 
     $.ajax(
         {
-            url: "../Blends/" + objDataSrc
+            url: objDataDir + objDataFile
+            , async: false
         }
     ).done(function(data){
         me.raw = data;
@@ -47,10 +51,8 @@ Collection.prototype.render = function(){
     }
 }
 
-Collection.prototype.load = function(){
-    var output = this.raw, i = 0;
-    var currentObject = null;
-    var vertices = [];
+Collection.prototype.loadMaterials = function(output){
+    var currentMaterial = null, i = 0;
     while (i < output.length)
     {
         var j = output.indexOf("\n", i);
@@ -58,7 +60,59 @@ Collection.prototype.load = function(){
             j = output.length;
          }
         var line = output.substr(i, j-i);
-        
+        i = j+1;
+        if(line.substr(0, 6) == "newmtl"){
+            if(currentMaterial){
+                this.materials.push(currentMaterial);
+            }
+            currentMaterial = {};
+            currentMaterial.name = line.split(" ")[1];
+
+        }
+        if(line.substr(0, 6) == "map_Kd"){
+            currentMaterial.path = line.split(" ")[1];
+        }
+
+        i = j+1;
+    }
+    if(currentMaterial){
+        this.materials.push(currentMaterial);
+    }
+
+    this.loadingMaterials = false;
+}
+
+Collection.prototype.load = function(){
+    var output = this.raw, i = 0;
+    var currentObject = null;
+    var vertices = [];
+    var textureVertices = [];
+    loadedMtlLibs = [];
+    while (i < output.length)
+    {
+        var j = output.indexOf("\n", i);
+        if (j == -1){
+            j = output.length;
+         }
+        var line = output.substr(i, j-i);
+        if(line.substr(0, 6) == "mtllib"){
+            var mtllib = line.split(" ")[1];
+            if(loadedMtlLibs.indexOf(mtllib) === -1)
+            {
+                loadedMtlLibs.push(mtllib);
+                this.loadingMaterials = true;
+                var me = this;
+                $.ajax(
+                {
+                    url: this.dataDir + mtllib
+                    , async: false
+                }
+                ).done(function(data){
+                    me.loadMaterials(data);
+                });
+            }
+        }
+
         if(line.substr(0, 2) == "o "){
             if(currentObject){
                 currentObject.setColor(this.color);
@@ -81,7 +135,7 @@ Collection.prototype.load = function(){
             currentObject.itemSize = 3;
             currentObject.itemNum = 0;
 
-            currentObject.colorSize = 4;
+            currentObject.textureSize = 2;
             currentObject.colorNum = 0;
             currentObject.listType = this.renderer.engine.gl.TRIANGLE_STRIP;
 
@@ -108,27 +162,54 @@ Collection.prototype.load = function(){
             vertices.push(point);
         }
 
+        if(line.substr(0, 3) == "vt "){
+            var values = line.split(" ");
+            var point = [];
+            for(var ind in values){
+                var value = values[ind];
+                if(value != "vt")
+                {
+                    point.push(value);
+                }
+            }
+            textureVertices.push(point);
+        }
+
         if(line.substr(0, 2) == "f "){
             var values = line.split(" ");
             for(var ind in values){
                 var value = values[ind];
                 if(value != "f")
                 {
-                    value = value.split("/")[0];
-                    value = value - 1;
-                    var point = vertices[value];
+                    var vert = value.split("/")[0];
+                    vert = vert - 1;
+                    var point = vertices[vert];
                     for(id in point){
                         currentObject.addVertice(point[id]);
+                    }
+                    var tex = value.split("/")[1];
+                    tex = tex - 1;
+                    var point = textureVertices[tex];
+                    for(id in point){
+                        currentObject.addTextureVertice(point[id]);
                     }
                 }                
             }
         }
-        
+        if(line.substr(0, 6) == "usemtl"){
+            var matname = line.split(" ")[1];
+            for(i in this.materials){
+                if(this.materials[i].name == matname){
+                    currentObject.loadTexture(this.dataDir + this.materials[i].path);
+                }
+            }
+        }
+
         i = j+1;
     }
 
     if(currentObject){
-        currentObject.setColor(this.color);
+        currentObject.initBuffer(this.renderer);
         this.objects.push(currentObject);
     }
 }
