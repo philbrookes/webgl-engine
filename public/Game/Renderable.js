@@ -29,8 +29,10 @@ Renderable.prototype.handleLoadedTexture = function(texture){
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+    gl.generateMipmap(gl.TEXTURE_2D);
+
     gl.bindTexture(gl.TEXTURE_2D, null);
 }
 
@@ -76,21 +78,16 @@ Renderable.prototype.draw = function(renderer) {
 }
 
 Renderable.prototype.initBuffer = function(renderer) {
-    this.setupTextureArray(renderer);
     this.vertexPositionBuffer = renderer.engine.gl.createBuffer();
     renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     renderer.engine.gl.bufferData(renderer.engine.gl.ARRAY_BUFFER, new Float32Array(this.vertices), renderer.engine.gl.STATIC_DRAW);
     this.vertexPositionBuffer.itemSize = this.itemSize;
     this.vertexPositionBuffer.numItems = this.itemNum;
-
-    this.vertexColorBuffer = renderer.engine.gl.createBuffer();
-    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.vertexColorBuffer);
-    renderer.engine.gl.bufferData(renderer.engine.gl.ARRAY_BUFFER, new Float32Array(this.colors), renderer.engine.gl.STATIC_DRAW);
-    this.vertexColorBuffer.itemSize = this.colorSize;
-    this.vertexColorBuffer.numItems = this.colorNum;
+    this.setupTextureArray(renderer);
 }
 
 Renderable.prototype.setupTextureArray = function(renderer){
+
     var textureCoords = this.textureVertices;
     this.cubeVertexTextureCoordBuffer = renderer.engine.gl.createBuffer();
     renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.cubeVertexTextureCoordBuffer);
