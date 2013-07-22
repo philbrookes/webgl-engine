@@ -1,7 +1,8 @@
 function Collector(renderer){
     this.init(
         renderer
-        , "Collector/Collector.obj"
+        , "objects/Collector/"
+        , "Collector.obj"
     );
     this.scale = 1;
     this.speedPerSecond = 10;
