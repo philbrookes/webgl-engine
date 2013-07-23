@@ -1,6 +1,6 @@
 # Blender v2.63 (sub 0) OBJ File: 'Collector.blend'
 # www.blender.org
-mtllib Collector.mtl
+mtllib Crates.mtl
 o Cube
 v -6.677078 -0.083858 4.842278
 v -6.677078 -0.083858 -6.485891

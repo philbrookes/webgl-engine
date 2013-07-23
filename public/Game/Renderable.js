@@ -97,16 +97,6 @@ Renderable.prototype.setupTextureArray = function(renderer){
     this.vertexTextureCoordBuffer.numItems = this.textureNum;
 }
 
-Renderable.prototype.setColor = function(color){
-    this.color = color;
-    this.colors = [];
-    for(var i = 0; i < this.colorNum; i++){
-        this.colors = this.colors.concat(this.color);
-    }
-    this.initBuffer(this.renderer);
-}
-
-
 Renderable.prototype.position = function(x, y, z){
     this.x = x;
     this.y = y;

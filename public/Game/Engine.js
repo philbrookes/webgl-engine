@@ -1,5 +1,22 @@
 function Engine(canvasId){
     this.canvas = document.getElementById("canvas");
+    this.shaderFS = "precision mediump float;" + 
+            "varying vec2 vTextureCoord;" + 
+            "uniform sampler2D uSampler;" + 
+            "void main(void) {" + 
+            "    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));" + 
+            "}";
+
+    this.shaderVS = "attribute vec3 aVertexPosition;" + 
+            "attribute vec2 aTextureCoord;" + 
+            "uniform mat4 uMVMatrix;" + 
+            "uniform mat4 uPMatrix;" + 
+            "varying vec2 vTextureCoord;" + 
+            "void main(void) {" + 
+            "    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);" + 
+            "    vTextureCoord = aTextureCoord;" + 
+            "}";
+
     this.initGL();
     this.initShaders();
 
@@ -7,7 +24,39 @@ function Engine(canvasId){
 
     this.objects = [];
 
-    this.renderer = new Renderer(this);    
+    this.renderer = new Renderer(this);
+
+    this.renderer.camera.lookAt(0, 0, 0);
+    this.renderer.camera.x = 0;
+    this.renderer.camera.y = 5;
+    this.renderer.camera.z = 12;
+
+    this.lastTick = new Date().getTime();
+    var me = this;
+    requestAnimationFrame(function(){
+        me.tick();
+    });
+
+    this.preRender = null;
+    this.postRender = null;
+}
+
+Engine.prototype.tick = function(){
+    this.renderer.timeElapsed = new Date().getTime() - this.lastTick;
+    var fps = 1000 / (engine.renderer.timeElapsed);
+    if(typeof this.preRender == "function"){
+        this.preRender();
+    }
+    this.renderer.render();
+    if(typeof this.postRender == "function"){
+        this.postRender();
+    }
+    this.process();
+    var me = this;
+    requestAnimationFrame(function(){
+        me.tick();
+    });
+    this.lastTick = new Date().getTime();
 }
 
 Engine.prototype.initGL = function(){
@@ -20,31 +69,16 @@ Engine.prototype.initGL = function(){
 }
 
 Engine.prototype.getShader = function(shaderId){
-    var shaderScript = document.getElementById(shaderId);
-    if(!shaderScript){
+    if(shaderId == "shader-fs"){
+        var shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+        this.gl.shaderSource(shader, this.shaderFS);
+    }else if(shaderId == "shader-vs"){
+        var shader = this.gl.createShader(this.gl.VERTEX_SHADER);
+        this.gl.shaderSource(shader, this.shaderVS);
+    }else{
         return null;
     }
 
-    var str = "";
-    var k = shaderScript.firstChild;
-    while(k) {
-        if(k.nodeType == 3) {
-            str += k.textContent;
-        }
-        k = k.nextSibling;
-    }
-
-    var shader;
-
-    if(shaderScript.type == "x-shader/x-fragment") {
-        shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
-    } else if (shaderScript .type == "x-shader/x-vertex") {
-        shader = this.gl.createShader(this.gl.VERTEX_SHADER);
-    } else {
-        return null;
-    }
-
-    this.gl.shaderSource(shader, str);
     this.gl.compileShader(shader);
 
     if(!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)){

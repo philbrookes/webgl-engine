@@ -6,69 +6,25 @@
 <script type="text/javascript" src="Game\Renderer.js"></script>
 <script type="text/javascript" src="Game\Renderable.js"></script>
 <script type="text/javascript" src="Game\Collection.js"></script>
-<script type="text/javascript" src="Game\Collector.js"></script>
+<script type="text/javascript" src="Game\Crates.js"></script>
 <script type="text/javascript" src="Game\Camera.js"></script>
 
-        <script id="shader-fs" type="x-shader/x-fragment">
-            precision mediump float;
-
-            varying vec2 vTextureCoord;
-
-            uniform sampler2D uSampler;
-
-            void main(void) {
-                gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-            }
-        </script>
-
-        <script id="shader-vs" type="x-shader/x-vertex">
-            attribute vec3 aVertexPosition;
-            attribute vec2 aTextureCoord;
-
-            uniform mat4 uMVMatrix;
-            uniform mat4 uPMatrix;
-
-            varying vec2 vTextureCoord;
-
-            void main(void) {
-                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-                vTextureCoord = aTextureCoord;
-            }
-        </script>
-
         <script type="text/javascript">
-            var engine, lastTick = new Date().getTime(), timeElapsed = 0, collector;
+            var engine;
 
-            function webGLStart(){
+            $(document).ready(function(){
                 engine = new Engine("canvas");
-
-                requestAnimationFrame(tick);
                 
-                collector = new Collector(engine.renderer);
-                engine.addItem(collector);
-                collector.x = 0;
-                collector.y = 0;
-                collector.z = 0;
+                var crates = new Crates(engine.renderer);
+                engine.addItem(crates);
 
-                engine.renderer.camera.lookAt(0, 0, 0);
-                engine.renderer.camera.x = 0;
-                engine.renderer.camera.y = 0;
-                engine.renderer.camera.z = 8;
-
-                canvas.onmousedown = handleMouseDown;
+                $(canvas).mousedown(handleMouseDown);
                 document.onmouseup = handleMouseUp;
                 document.onmousemove = handleMouseMove;
                 $(canvas).bind("mousewheel", handleZoom);
-            }
+            });
 
-            function tick(){
-                engine.renderer.timeElapsed = new Date().getTime() - lastTick;
-                var fps = 1000 / (engine.renderer.timeElapsed);
-                engine.renderer.render();
-                engine.process();
-                requestAnimationFrame(tick);
-                lastTick = new Date().getTime();
-            }
+            
 
             var mouseDown = false;
             var lastMouseX = null;
@@ -120,7 +76,7 @@
 
         </script>
     </head>
-    <body onload="webGLStart()" style="margin: 0; padding: 0; border: 0;">
+    <body style="margin: 0; padding: 0; border: 0;">
         <canvas id="canvas" style="border: none; width: 100%; height: 100%;" width=1920 height=900></canvas>
     </body>
 </html>

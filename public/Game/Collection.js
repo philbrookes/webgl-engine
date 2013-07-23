@@ -9,9 +9,7 @@ var loadedCollections = [];
 Collection.prototype.init = function(renderer, objDataDir, objDataFile){
     this.renderer = renderer;
 
-    this.setColor([1, 1, 1, 1.0]);
     this.scale = 1;
-    this.armyId = 1;
 
     this.x = 0.0;
     this.y = 0.0;
@@ -115,7 +113,7 @@ Collection.prototype.load = function(){
 
         if(line.substr(0, 2) == "o "){
             if(currentObject){
-                currentObject.setColor(this.color);
+                currentObject.initBuffer(this.renderer);
                 this.objects.push(currentObject);
             }
 
@@ -211,13 +209,5 @@ Collection.prototype.load = function(){
     if(currentObject){
         currentObject.initBuffer(this.renderer);
         this.objects.push(currentObject);
-    }
-}
-
-
-Collection.prototype.setColor = function(color){
-    this.color = color;
-    for(id in this.objects){
-        this.objects[id].setColor(this.color);
     }
 }
