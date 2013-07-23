@@ -147,20 +147,6 @@ Engine.prototype.getItems = function(){
     return this.items;
 }
 
-Engine.prototype.getCloseItems = function(point, range){
-    var ret = [];
-    for(i in this.items){
-        var item = this.items[i];
-        if( Math.abs(item.x - point.x) > range
-            && Math.abs(item.y - point.y) > range
-            && Math.abs(item.z - point.z) > range
-        ){
-            ret.append(item);
-        }
-    }
-    return ret;
-}
-
 Engine.prototype.removeItem = function(item){
     var index = this.items.indexOf(item);
     if(index != -1)
@@ -171,29 +157,4 @@ Engine.prototype.removeItem = function(item){
 
 Engine.prototype.removeItems = function(){
     this.items = [];
-}
-
-Engine.prototype.distance = function(point1, point2){
-    var xDiff = Math.abs(point1.x - point2.x);
-    var yDiff = Math.abs(point1.y - point2.y);
-    var zDiff = Math.abs(point1.z - point2.z);
-
-    var xyDiff = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff));
-    var xyzDiff = Math.sqrt((xyDiff * xyDiff) + (zDiff * zDiff));
-
-    return xyzDiff;
-}
-
-Engine.prototype.loadObject = function(path){
-    if(this.objects[path]){
-        return this.objects[path];
-    }
-
-    $.ajax({
-        url: "../Blends/Base/Base.obj"
-    }).done(
-        function(data){
-            console.log(data);
-        }
-    );
 }

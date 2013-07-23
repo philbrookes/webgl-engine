@@ -1,18 +1,16 @@
 <html>
     <head>
-<script type="text/javascript" src="third-party\glMatrix-0.9.5.min.js"></script>
-<script type="text/javascript" src="third-party\jquery-1.9.1.js"></script>
-<script type="text/javascript" src="webgl-engine\Engine.js"></script>
-<script type="text/javascript" src="webgl-engine\UI.js"></script>
-<script type="text/javascript" src="webgl-engine\Renderer.js"></script>
-<script type="text/javascript" src="webgl-engine\Renderable.js"></script>
-<script type="text/javascript" src="webgl-engine\Collection.js"></script>
-<script type="text/javascript" src="webgl-engine\Camera.js"></script>
-<script type="text/javascript" src="Game\Crates.js"></script>
-
+        <script type="text/javascript" src="third-party\glMatrix-0.9.5.min.js"></script>
+        <script type="text/javascript" src="third-party\jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="webgl-engine\Engine.js"></script>
+        <script type="text/javascript" src="webgl-engine\UI.js"></script>
+        <script type="text/javascript" src="webgl-engine\Renderer.js"></script>
+        <script type="text/javascript" src="webgl-engine\Renderable.js"></script>
+        <script type="text/javascript" src="webgl-engine\Collection.js"></script>
+        <script type="text/javascript" src="webgl-engine\Camera.js"></script>
+        <script type="text/javascript" src="Game\Crates.js"></script>
         <script type="text/javascript">
             var engine;
-
             $(document).ready(function(){
                 engine = new Engine("canvas");
                 var crates = new Crates(engine.renderer);
