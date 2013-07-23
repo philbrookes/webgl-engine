@@ -27,7 +27,7 @@ Renderable.prototype.addTextureVertice = function(vertice){
 Renderable.prototype.handleLoadedTexture = function(texture){
     var gl = this.renderer.engine.gl;
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
@@ -63,18 +63,19 @@ Renderable.prototype.prepareMatrix = function(renderer){
 
 Renderable.prototype.draw = function(renderer) {
     var gl = renderer.engine.gl;
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-    gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
+    
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
-    gl.vertexAttribPointer(renderer.engine.shaderProgram.textureCoordAttribute, this.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(renderer.engine.shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
 
-//    gl.activeTexture(gl.TEXTURE0);
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-//    gl.uniform1i(renderer.engine.shaderProgram.samplerUniform, 0);
+    gl.uniform1i(renderer.engine.shaderProgram.samplerUniform, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+    gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
     renderer.setMatrixUniforms();
-    gl.drawArrays(this.listType, 0, this.vertexTextureCoordBuffer.numItems);
+    gl.drawArrays(this.listType, 0, this.vertexPositionBuffer.numItems);
 }
 
 Renderable.prototype.initBuffer = function(renderer) {

@@ -137,7 +137,7 @@ Collection.prototype.load = function(){
 
             currentObject.textureSize = 2;
             currentObject.colorNum = 0;
-            currentObject.listType = this.renderer.engine.gl.TRIANGLE_STRIP;
+            currentObject.listType = this.renderer.engine.gl.TRIANGLES;
 
             var values = line.split(" ");
             for(var ind in values){
