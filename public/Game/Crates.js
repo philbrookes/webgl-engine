@@ -1,7 +1,7 @@
 function Crates(renderer){
     this.init(
         renderer
-        , "objects/Crates/"
+        , "Game/objects/Crates/"
         , "Crates.obj"
     );
 }
