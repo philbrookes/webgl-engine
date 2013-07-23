@@ -4,7 +4,7 @@ I am building a webgl rendering engine, only for my own use, and only really so 
 
 If you want to use it, go for it, but please give me credit!
 
-This is all my own code, with the exception of the matrix multiplication library, and jQuery.
+This is all my own code, with the exception of the matrix multiplication library (https://github.com/toji/gl-matrix), and jQuery (https://github.com/jquery/jquery).
 
 At the moment this will only work with .obj files that are textured into a .mtl file.
 
