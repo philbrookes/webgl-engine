@@ -5,8 +5,8 @@ module.exports = function(grunt) {
 			options: {
 			},
 			build: {
-				src: './public/webgl-engine/*.js',
-				dest: './public/webgl-engine/dist/webgl-engine.min.js'
+				src: './webgl-engine/*.js',
+				dest: './public/webgl-engine/webgl-engine.min.js'
 			}
 		}
 	});
