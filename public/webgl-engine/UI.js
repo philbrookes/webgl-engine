@@ -35,7 +35,7 @@ UI.prototype.handleMouseMove = function(event) {
     var newY = event.clientY;
 
     var deltaX = newX - this.lastMouseX;
-    this.engine.renderer.camera.yaw += deltaX;
+    this.engine.renderer.camera.yaw -= deltaX;
 
     var deltaY = newY - this.lastMouseY;
     this.engine.renderer.camera.pitch -= deltaY;
