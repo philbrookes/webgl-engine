@@ -25,7 +25,8 @@ function Engine(canvasId){
     this.objects = [];
 
     this.renderer = new Renderer(this);
-
+    this.ui = new UI(this);
+    
     this.renderer.camera.lookAt(0, 0, 0);
     this.renderer.camera.x = 0;
     this.renderer.camera.y = 5;
@@ -33,9 +34,15 @@ function Engine(canvasId){
 
     this.lastTick = new Date().getTime();
     var me = this;
-    requestAnimationFrame(function(){
-        me.tick();
-    });
+    if(typeof requestAnimationFrame == "function"){
+        requestAnimationFrame(function(){
+            me.tick();
+        });
+    } else if(typeof mozRequestAnimationFrame == "function"){
+        mozRequestAnimationFrame(function(){
+            me.tick();
+        });
+    }
 
     this.preRender = null;
     this.postRender = null;
@@ -53,9 +60,15 @@ Engine.prototype.tick = function(){
     }
     this.process();
     var me = this;
-    requestAnimationFrame(function(){
-        me.tick();
-    });
+    if(typeof requestAnimationFrame == "function"){
+        requestAnimationFrame(function(){
+            me.tick();
+        });
+    } else if(typeof mozRequestAnimationFrame == "function"){
+        mozRequestAnimationFrame(function(){
+            me.tick();
+        });
+    }
     this.lastTick = new Date().getTime();
 }
 
