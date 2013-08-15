@@ -16,19 +16,16 @@ function Engine(canvasId){
             "uniform mat4 uPMatrix;" + 
             "uniform mat3 uNMatrix;" +
             "uniform vec3 uAmbientColor;" +
-            "uniform vec3 uPointLightingLocation;" +
-            "uniform vec3 uPointLightingColor;" +
+            "uniform vec3 uLightingDirection;" +
+            "uniform vec3 uDirectionalColor;" +
             "varying vec2 vTextureCoord;" + 
             "varying vec3 vLightWeighting;" +
             "void main(void) {" + 
-            "   vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);" +
-            "   gl_Position = uPMatrix * mvPosition;" +
+            "   gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);" +
             "   vTextureCoord = aTextureCoord;" +
-            
-            "   vec3 lightDirection = normalize(uPointLightingLocation - mvPosition.xyz);" +
             "   vec3 transformedNormal = uNMatrix * aVertexNormal;" +
             "   float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);" +
-            "   vLightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;" +
+            "   vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;" +
             "}";
 
     this.initGL();
@@ -133,16 +130,21 @@ Engine.prototype.initShaders = function(){
     this.shaderProgram.vertexPositionAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
     this.gl.enableVertexAttribArray(this.shaderProgram.vertexPositionAttribute);
 
+    this.shaderProgram.vertexNormalAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexNormal");
+    this.gl.enableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);
+
     this.shaderProgram.textureCoordAttribute = this.gl.getAttribLocation(this.shaderProgram, "aTextureCoord");
     this.gl.enableVertexAttribArray(this.shaderProgram.textureCoordAttribute);
 
     this.shaderProgram.pMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
-    this.shaderProgram.mvMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");                
+    this.shaderProgram.mvMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
+    this.shaderProgram.nMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uNMatrix");
+
     this.shaderProgram.samplerUniform = this.gl.getUniformLocation(this.shaderProgram, "uSampler");
 
     this.shaderProgram.ambientColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uAmbientColor");
-    this.shaderProgram.pointLightingLocationUniform = this.gl.getUniformLocation(this.shaderProgram, "uPointLightingLocation");
-    this.shaderProgram.pointLightingColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uPointLightingColor");
+    this.shaderProgram.lightingDirectionUniform = this.gl.getUniformLocation(this.shaderProgram, "uLightingDirection");
+    this.shaderProgram.directionalColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uDirectionalColor");
 }
 
 Engine.prototype.process = function(){

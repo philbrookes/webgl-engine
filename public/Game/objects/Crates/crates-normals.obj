@@ -1,6 +1,6 @@
 # Blender v2.63 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib crates-nornals.mtl
+mtllib crates-normals.mtl
 o Mesh.004_Mesh.001_Cube.001
 v -1.054727 1.997420 0.409058
 v -0.689491 1.997421 -1.557309
