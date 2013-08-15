@@ -41,6 +41,10 @@ Renderer.prototype.render = function(){
     this.engine.gl.clear(this.engine.gl.COLOR_BUFFER_BIT | this.engine.gl.DEPTH_BUFFER_BIT);
     mat4.perspective(45, this.engine.gl.viewportWidth / this.engine.gl.viewportHeight, 0.1, 10000.0, this.pMatrix);
 
+
+    this.prepareLighting();
+    
+
     mat4.identity(this.mvMatrix);
 
     this.pushMatrix();
@@ -48,8 +52,6 @@ Renderer.prototype.render = function(){
     //camera
     this.camera.position(this);
     this.camera.rotate(this);
-    
-    this.prepareLighting();
 
     var items = this.engine.getItems();
     for(i in items) {
@@ -61,7 +63,6 @@ Renderer.prototype.render = function(){
         item.render();
         this.popMatrix();
     }
-
     this.popMatrix();
 }
 
@@ -71,10 +72,6 @@ Renderer.prototype.degToRad = function(degrees) {
 
 Renderer.prototype.prepareLighting = function() {
     this.engine.gl.uniform3f(this.engine.shaderProgram.ambientColorUniform, 0.1, 0.1, 0.1  );
-    var ld = [0, -1, 0];
-    var ald = vec3.create();
-    vec3.normalize(ld, ald);
-    vec3.scale(ald, -1);
-    this.engine.gl.uniform3fv(this.engine.shaderProgram.lightingDirectionUniform, ald);
+    this.engine.gl.uniform3f(this.engine.shaderProgram.lightingDirectionUniform, 0, 1, 0);
     this.engine.gl.uniform3f(this.engine.shaderProgram.directionalColorUniform, 1, 1, 1);
 }
