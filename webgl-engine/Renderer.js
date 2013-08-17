@@ -75,9 +75,8 @@ Renderer.prototype.prepareLighting = function() {
     this.engine.gl.uniform3f(this.engine.shaderProgram.ambientColorUniform, 0, 0, 0);
 
     //point lighting
-    var alp = vec3.create();
-    vec3.normalize([0, 0, 0], alp);
-    //mat4.multiplyVec3(this.mvMatrix, alp);
+    var alp = vec3.create([0, 0, -1]);
+    mat4.multiplyVec3(this.mvMatrix, alp);
     this.engine.gl.uniform3fv(this.engine.shaderProgram.pointLightingLocationUniform, alp);
     this.engine.gl.uniform3f(this.engine.shaderProgram.pointLightingColorUniform, 0.8, 0.8, 0.8);
 }
