@@ -72,7 +72,7 @@ Renderer.prototype.degToRad = function(degrees) {
 
 Renderer.prototype.prepareLighting = function() {
     //ambient lighting
-    this.engine.gl.uniform3f(this.engine.shaderProgram.ambientColorUniform, 0, 0, 0);
+    this.engine.gl.uniform3f(this.engine.shaderProgram.ambientColorUniform, 0.1, 0.1, 0.1);
 
     //point lighting
     var alp = vec3.create([0, 0, -1]);
