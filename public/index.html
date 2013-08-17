@@ -9,6 +9,9 @@
             $(document).ready(function(){
                 engine = new Engine("canvas");
                 var crates = new Crates(engine.renderer);
+                crates.y = 5;
+                engine.renderer.camera.lookAt(0, 5, 0);
+                engine.renderer.camera.y = 10;
                 engine.addItem(crates);
             });
         </script>

@@ -40,7 +40,10 @@ Camera.prototype.panTo = function(x, y, z){
 }
 
 Camera.prototype.processPanning = function(renderer){
-    if(this.targetFocusX == this.focusX && this.targetFocusY == this.focusY && this.targetFocusZ == this.focusZ){
+    if(    this.targetFocusX == this.focusX 
+        && this.targetFocusY == this.focusY 
+        && this.targetFocusZ == this.focusZ
+    ) {
         return;
     }
     var tx = this.targetFocusX - this.focusX;

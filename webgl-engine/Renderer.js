@@ -4,7 +4,11 @@ function Renderer(Engine) {
     this.matrixStack = [];
     this.pMatrix = mat4.create();
     this.elapsedTime = 0;
+    this.prepareLighting();
     this.camera = new Camera();
+
+    this.lightingUpwards = false;
+    this.ly = 5;
 }
 
 Renderer.prototype.pushMatrix = function(){
@@ -14,7 +18,7 @@ Renderer.prototype.pushMatrix = function(){
 
 Renderer.prototype.popMatrix = function(){
     if(this.matrixStack.length == 0) {
-        throw "Error no popable matrix";
+        throw "Error no poppable matrix";
     }
     this.mvMatrix = this.matrixStack.pop();
 }
@@ -37,7 +41,6 @@ Renderer.prototype.render = function(){
         return;
     }
     this.engine.gl.viewport(0, 0, this.engine.gl.viewportWidth, this.engine.gl.viewportHeight);
-    this.engine.gl.clearColor(0.5, 0.5, 0.5, 1);
     this.engine.gl.clear(this.engine.gl.COLOR_BUFFER_BIT | this.engine.gl.DEPTH_BUFFER_BIT);
     mat4.perspective(45, this.engine.gl.viewportWidth / this.engine.gl.viewportHeight, 0.1, 10000.0, this.pMatrix);
 
@@ -59,9 +62,8 @@ Renderer.prototype.render = function(){
         item.render();
         this.popMatrix();
     }
-    this.popMatrix();
     this.prepareLighting();
-    
+    this.popMatrix();    
 }
 
 Renderer.prototype.degToRad = function(degrees) {
@@ -69,7 +71,13 @@ Renderer.prototype.degToRad = function(degrees) {
 }
 
 Renderer.prototype.prepareLighting = function() {
-    this.engine.gl.uniform3f(this.engine.shaderProgram.ambientColorUniform, 0.1, 0.1, 0.1  );
-    this.engine.gl.uniform3f(this.engine.shaderProgram.lightingDirectionUniform, 0, 1, 1);
-    this.engine.gl.uniform3f(this.engine.shaderProgram.directionalColorUniform, 0.8, 0.8, 0.8);
+    //ambient lighting
+    this.engine.gl.uniform3f(this.engine.shaderProgram.ambientColorUniform, 0, 0, 0);
+
+    //point lighting
+    var alp = vec3.create();
+    vec3.normalize([0, 0, 0], alp);
+    //mat4.multiplyVec3(this.mvMatrix, alp);
+    this.engine.gl.uniform3fv(this.engine.shaderProgram.pointLightingLocationUniform, alp);
+    this.engine.gl.uniform3f(this.engine.shaderProgram.pointLightingColorUniform, 0.8, 0.8, 0.8);
 }
