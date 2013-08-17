@@ -2,19 +2,32 @@ function Engine(canvasId){
     this.canvas = document.getElementById("canvas");
     this.shaderFS = "precision mediump float;" + 
             "varying vec2 vTextureCoord;" + 
+            "varying vec3 vLightWeighting;" +
             "uniform sampler2D uSampler;" + 
             "void main(void) {" + 
-            "    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));" + 
+            "   vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));" +
+            "   gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);" +
             "}";
 
     this.shaderVS = "attribute vec3 aVertexPosition;" + 
+            "attribute vec3 aVertexNormal;" +
             "attribute vec2 aTextureCoord;" + 
             "uniform mat4 uMVMatrix;" + 
             "uniform mat4 uPMatrix;" + 
+            "uniform mat3 uNMatrix;" +
+            "uniform vec3 uAmbientColor;" +
+            "uniform vec3 uPointLightingLocation;" +
+            "uniform vec3 uPointLightingColor;" +
             "varying vec2 vTextureCoord;" + 
+            "varying vec3 vLightWeighting;" +
             "void main(void) {" + 
-            "    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);" + 
-            "    vTextureCoord = aTextureCoord;" + 
+            "   vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);" +
+            "   gl_Position = uPMatrix * mvPosition;" +
+            "   vTextureCoord = aTextureCoord;" +
+            "   vec3 lightDirection = normalize(uPointLightingLocation - mvPosition.xyz);" + 
+            "   vec3 transformedNormal = uNMatrix * aVertexNormal;" +
+            "   float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);" +
+            "   vLightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;" +
             "}";
 
     this.initGL();
@@ -77,7 +90,7 @@ Engine.prototype.initGL = function(){
     this.gl.viewportWidth = this.canvas.width;
     this.gl.viewportHeight = this.canvas.height;
 
-    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.gl.clearColor(0.5, 0.5, 0.5, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
 }
 
@@ -119,12 +132,23 @@ Engine.prototype.initShaders = function(){
     this.shaderProgram.vertexPositionAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
     this.gl.enableVertexAttribArray(this.shaderProgram.vertexPositionAttribute);
 
+    this.shaderProgram.vertexNormalAttribute = this.gl.getAttribLocation(this.shaderProgram, "aVertexNormal");
+    this.gl.enableVertexAttribArray(this.shaderProgram.vertexNormalAttribute);
+
     this.shaderProgram.textureCoordAttribute = this.gl.getAttribLocation(this.shaderProgram, "aTextureCoord");
     this.gl.enableVertexAttribArray(this.shaderProgram.textureCoordAttribute);
 
     this.shaderProgram.pMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
-    this.shaderProgram.mvMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");                
+    this.shaderProgram.mvMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
+    this.shaderProgram.nMatrixUniform = this.gl.getUniformLocation(this.shaderProgram, "uNMatrix");
+
     this.shaderProgram.samplerUniform = this.gl.getUniformLocation(this.shaderProgram, "uSampler");
+
+    this.shaderProgram.ambientColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uAmbientColor");
+    
+    this.shaderProgram.pointLightingLocationUniform = this.gl.getUniformLocation(this.shaderProgram, "uPointLightingLocation");
+    this.shaderProgram.pointLightingColorUniform = this.gl.getUniformLocation(this.shaderProgram, "uPointLightingColor");
+
 }
 
 Engine.prototype.process = function(){
@@ -133,8 +157,7 @@ Engine.prototype.process = function(){
     for(var i in items){
         item = items[i];
         if(typeof item.process != "function"){
-            continue;
-        }
+            continue;}
         item.process(this);
     }
 }

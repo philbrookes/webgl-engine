@@ -85,6 +85,7 @@ Collection.prototype.load = function(){
     var currentObject = null;
     var vertices = [];
     var textureVertices = [];
+    var normals = [];
     loadedMtlLibs = [];
     while (i < output.length)
     {
@@ -173,6 +174,19 @@ Collection.prototype.load = function(){
             textureVertices.push(point);
         }
 
+        if(line.substr(0, 3) == "vn "){
+            var values = line.split(" ");
+            var point = [];
+            for(var ind in values){
+                var value = values[ind];
+                if(value != "vn")
+                {
+                    point.push(value);
+                }
+            }
+            normals.push(point);
+        }
+
         if(line.substr(0, 2) == "f "){
             var values = line.split(" ");
             for(var ind in values){
@@ -190,6 +204,12 @@ Collection.prototype.load = function(){
                     var point = textureVertices[tex];
                     for(id in point){
                         currentObject.addTextureVertice(point[id]);
+                    }
+                    var nrm = value.split("/")[2];
+                    nrm = nrm - 1;
+                    var point = normals[nrm];
+                    for(id in point){
+                        currentObject.addNormal(point[id]);
                     }
                 }                
             }

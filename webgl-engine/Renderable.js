@@ -24,6 +24,15 @@ Renderable.prototype.addTextureVertice = function(vertice){
     this.textureNum = Math.floor(this.textureVertices.length / this.textureSize);
 }
 
+Renderable.prototype.addNormal = function(normal){
+    if(typeof this.normals !== "object")
+    {
+        this.normals = [];
+    }
+    this.normals.push(normal);
+    this.normalNum = Math.floor(this.normals.length / 3);
+}
+
 Renderable.prototype.handleLoadedTexture = function(texture){
     var gl = this.renderer.engine.gl;
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -62,16 +71,19 @@ Renderable.prototype.prepareMatrix = function(renderer){
 
 Renderable.prototype.draw = function(renderer) {
     var gl = renderer.engine.gl;
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+    gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.normalsBuffer);
+    gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
     
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTextureCoordBuffer);
-    gl.vertexAttribPointer(renderer.engine.shaderProgram.textureCoordAttribute, this.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(renderer.engine.shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(renderer.engine.shaderProgram.samplerUniform, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-    gl.vertexAttribPointer(renderer.engine.shaderProgram.vertexPositionAttribute, this.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     renderer.setMatrixUniforms();
     gl.drawArrays(this.listType, 0, this.vertexPositionBuffer.numItems);
@@ -84,6 +96,7 @@ Renderable.prototype.initBuffer = function(renderer) {
     this.vertexPositionBuffer.itemSize = this.itemSize;
     this.vertexPositionBuffer.numItems = this.itemNum;
     this.setupTextureArray(renderer);
+    this.setupNormalsArray(renderer);
 }
 
 Renderable.prototype.setupTextureArray = function(renderer){
@@ -95,6 +108,16 @@ Renderable.prototype.setupTextureArray = function(renderer){
     renderer.engine.gl.bufferData(renderer.engine.gl.ARRAY_BUFFER, new Float32Array(textureCoords), this.renderer.engine.gl.STATIC_DRAW);
     this.vertexTextureCoordBuffer.itemSize = this.textureSize;
     this.vertexTextureCoordBuffer.numItems = this.textureNum;
+}
+
+Renderable.prototype.setupNormalsArray = function(renderer){
+    var normals = this.normals;
+    this.normalsBuffer = renderer.engine.gl.createBuffer();
+    renderer.engine.gl.bindBuffer(renderer.engine.gl.ARRAY_BUFFER, this.normalsBuffer);
+
+    renderer.engine.gl.bufferData(renderer.engine.gl.ARRAY_BUFFER, new Float32Array(normals), renderer.engine.gl.STATIC_DRAW);
+    this.normalsBuffer.itemSize = 3;
+    this.normalsBuffer.numItems = this.normalNum;
 }
 
 Renderable.prototype.position = function(x, y, z){
