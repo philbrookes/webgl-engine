@@ -37,6 +37,8 @@ function Engine(canvasId){
 
     this.objects = [];
 
+    this.lights = [];
+
     this.renderer = new Renderer(this);
     this.ui = new UI(this);
     
@@ -180,4 +182,25 @@ Engine.prototype.removeItem = function(item){
 
 Engine.prototype.removeItems = function(){
     this.items = [];
+}
+
+
+Engine.prototype.addLight = function(light){
+    this.lights.push(light);
+}
+
+Engine.prototype.getLights = function(){
+    return this.lights;
+}
+
+Engine.prototype.removeLights = function(light){
+    var index = this.lights.indexOf(light);
+    if(index != -1)
+    {
+        this.lights.splice(index, 1);
+    }
+}
+
+Engine.prototype.removeLights = function(){
+    this.lights = [];
 }
