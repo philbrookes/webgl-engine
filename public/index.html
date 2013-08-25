@@ -19,6 +19,14 @@
                 crates.rotation = -0.01;
                 engine.renderer.camera.lookAt(0, -5, 0);
                 engine.addItem(crates);
+
+                var light = new Light();
+                light.x = 0;
+                light.y = -5;
+                light.z = 0;
+                light.colour = [0.8, 0.8, 0.8];
+
+                engine.addLight(light);
             });
         </script>
     </head>
