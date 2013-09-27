@@ -82,6 +82,10 @@ Renderer.prototype.prepareLighting = function() {
         if(!light instanceof Light){
             continue;
         }
+        if(! typeof light.getPositionV === "function")
+        {
+            continue;
+        }
         var alp = vec3.create(light.getPositionV());
         mat4.multiplyVec3(this.mvMatrix, alp);
         this.engine.gl.uniform3fv(this.engine.shaderProgram.pointLightingLocationUniform, alp);
