@@ -82,7 +82,7 @@ Renderer.prototype.prepareLighting = function() {
         if(!light instanceof Light){
             continue;
         }
-        if(! typeof light.getPositionV === "function")
+        if(! typeof light.getPositionV == "function")
         {
             continue;
         }
