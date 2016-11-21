@@ -1,5 +1,5 @@
 function Engine(canvasId){
-    this.canvas = document.getElementById("canvas");
+    this.canvas = document.getElementById(canvasId);
     this.shaderFS = "precision mediump float;" + 
             "varying vec2 vTextureCoord;" + 
             "varying vec3 vLightWeighting;" +
